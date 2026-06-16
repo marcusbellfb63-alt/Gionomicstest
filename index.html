@@ -29,7 +29,7 @@
     width: 100%;
     max-width: 100%;
     min-height: 100%;
-    overflow-x: hidden;
+    overflow-x: clip;
     background: var(--bg);
   }
   body {
@@ -53,8 +53,8 @@
     flex-direction: column;
     gap: 4px;
     width: 100%;
-    max-width: 100vw;
-    overflow-x: hidden;
+    max-width: 100%;
+    overflow-x: clip;
     box-sizing: border-box;
   }
   .brand-title {
@@ -99,13 +99,19 @@
     max-width: 900px;
     width: 100%;
     margin: 0 auto;
-    overflow-x: hidden;
+    overflow-x: clip;
     box-sizing: border-box;
   }
   .view, .app-header, nav.bottom-nav {
-    max-width: 100vw;
+    max-width: 100%;
   }
   .view.active { display: block; }
+
+  #tx-list {
+    max-width: 100%;
+    min-width: 0;
+    overflow-x: clip;
+  }
 
   /* Nav */
   nav.bottom-nav {
@@ -119,7 +125,7 @@
     z-index: 1000;
     padding-bottom: env(safe-area-inset-bottom);
     width: 100%;
-    overflow-x: hidden;
+    overflow-x: clip;
     box-sizing: border-box;
   }
   nav.bottom-nav button {
@@ -141,9 +147,11 @@
   /* Cards */
   .card-grid {
     display: grid;
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: var(--gap);
     margin-bottom: 16px;
+    min-width: 0;
+    max-width: 100%;
   }
   .card {
     background: var(--surface);
@@ -169,6 +177,10 @@
     font-size: 0.75rem;
     color: var(--text-dim);
     margin-top: 4px;
+    max-width: 100%;
+    min-width: 0;
+    overflow-wrap: anywhere;
+    word-break: break-word;
   }
   .positive { color: var(--accent); }
   .negative { color: var(--red); }
@@ -317,6 +329,11 @@
     text-transform: uppercase;
     font-weight: 700;
     letter-spacing: 0.5px;
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    vertical-align: top;
   }
   .badge-buy { background: rgba(61,220,151,0.15); color: var(--accent); }
   .badge-sell { background: rgba(239,83,80,0.15); color: var(--red); }
@@ -363,7 +380,7 @@
   }
   .holding-stats {
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
     gap: 8px;
     font-size: 0.85rem;
     min-width: 0;
@@ -498,6 +515,10 @@
     overflow-x: auto;
     padding-bottom: 4px;
     margin-bottom: 10px;
+    max-width: 100%;
+    width: 100%;
+    min-width: 0;
+    -webkit-overflow-scrolling: touch;
   }
   .filter-chip {
     flex: none;
@@ -728,6 +749,59 @@
   .perf-val { font-weight: 700; font-size: 1rem; font-variant-numeric: tabular-nums; }
   .perf-sub { font-size: 0.75rem; color: var(--text-dim); margin-top: 2px; }
 
+  /* Overflow debug overlays */
+  .overflow-highlight {
+    position: fixed;
+    border: 2px solid #ef5350;
+    background: rgba(239, 83, 80, 0.12);
+    pointer-events: none;
+    z-index: 9999;
+    box-sizing: border-box;
+  }
+  .overflow-highlight-label {
+    position: absolute;
+    top: -18px;
+    left: 0;
+    background: #ef5350;
+    color: #fff;
+    font-size: 9px;
+    font-weight: 700;
+    padding: 1px 4px;
+    border-radius: 3px;
+    white-space: nowrap;
+    max-width: 200px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  #overflow-debug-panel {
+    display: none;
+    position: fixed;
+    top: 60px;
+    right: 8px;
+    left: 8px;
+    max-width: 420px;
+    margin-left: auto;
+    background: var(--surface);
+    border: 2px solid #ef5350;
+    border-radius: var(--radius);
+    padding: 12px;
+    z-index: 10000;
+    max-height: 50vh;
+    overflow-y: auto;
+    font-size: 0.78rem;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+  }
+  #overflow-debug-panel.active { display: block; }
+  #overflow-debug-panel h4 { margin: 0 0 8px; color: #ef5350; font-size: 0.9rem; }
+  #overflow-debug-panel .od-row {
+    padding: 6px 0;
+    border-bottom: 1px solid var(--border);
+    cursor: pointer;
+  }
+  #overflow-debug-panel .od-row:last-child { border-bottom: none; }
+  #overflow-debug-panel .od-tag { font-weight: 700; color: var(--text); }
+  #overflow-debug-panel .od-meta { color: var(--text-dim); margin-top: 2px; }
+
   /* Desktop */
   @media (min-width: 760px) {
     :root { --browser-bottom-offset: 0px; }
@@ -749,7 +823,7 @@
       padding: 12px 20px;
       font-size: 0.85rem;
     }
-    .card-grid { grid-template-columns: repeat(4, 1fr); }
+    .card-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
     .full-card { grid-column: 1 / -1; }
     .mobile-only { display: none; }
     .desktop-only { display: block; }
@@ -757,7 +831,7 @@
   }
   @media (max-width: 759px) {
     .desktop-only { display: none; }
-    .card-grid { grid-template-columns: repeat(2, 1fr); }
+    .card-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
     #view-transactions .form-card {
       margin-bottom: calc(var(--bottom-nav-height) + var(--browser-bottom-offset) + 90px);
     }
@@ -1155,6 +1229,17 @@
   </div>
 
   <div class="form-card">
+    <h3>Layout Debug</h3>
+    <p style="color:var(--text-dim); font-size:0.85rem; margin-top:0;">Highlight every element wider than the viewport. Use after adding transactions to find side-scroll causes.</p>
+    <div class="btn-row">
+      <button class="btn secondary" id="btn-overflow-scan">Scan Overflow</button>
+      <button class="btn secondary" id="btn-overflow-clear">Clear Highlights</button>
+    </div>
+    <div id="overflow-debug-summary" style="font-size:0.82rem;color:var(--text-dim);margin-top:10px;"></div>
+    <div id="overflow-debug-list" style="margin-top:10px;font-size:0.78rem;max-height:240px;overflow-y:auto;"></div>
+  </div>
+
+  <div class="form-card">
     <h3>Clear All Data</h3>
     <p style="color:var(--text-dim); font-size:0.85rem; margin-top:0;">Permanently delete all transactions, prices, settings, and snapshots.</p>
     <button class="btn danger" id="btn-clear-data">Clear All Data</button>
@@ -1201,6 +1286,11 @@
 
   <div class="version-tag">Gionomics v1.4.6</div>
   <div class="version-tag" style="padding-top:0;">Current file/version: GionomicsV1.4.6.html</div>
+</div>
+
+<div id="overflow-debug-panel">
+  <h4>Elements wider than viewport</h4>
+  <div id="overflow-debug-panel-body"></div>
 </div>
 
 <!-- ============ BOTTOM NAV ============ -->
@@ -2733,6 +2823,8 @@ const Tools = {
     document.getElementById('file-import').addEventListener('change', (e) => this.importBackup(e));
     document.getElementById('btn-clear-data').addEventListener('click', () => this.confirmClear());
     document.getElementById('btn-sample-data').addEventListener('click', () => this.confirmSampleData());
+    document.getElementById('btn-overflow-scan').addEventListener('click', () => OverflowDebug.scan(true));
+    document.getElementById('btn-overflow-clear').addEventListener('click', () => OverflowDebug.clear());
     this.renderDataCheck();
     this.renderPriceUpdates();
   },
@@ -3084,33 +3176,168 @@ const App = {
     }
     Tools.renderDataCheck();
     Tools.renderPriceUpdates();
-    setTimeout(findHorizontalOverflow, 300);
+    OverflowDebug.scan(false);
   }
 };
 
 /* =========================================================
-   DEBUG: HORIZONTAL OVERFLOW DETECTOR (console-only)
+   OVERFLOW DEBUG — highlights elements wider than viewport
    ========================================================= */
-function findHorizontalOverflow() {
-  const viewportWidth = document.documentElement.clientWidth;
-  const offenders = [];
-  document.querySelectorAll('body *').forEach(el => {
+const OverflowDebug = {
+  _highlights: [],
+  _enabled: location.search.includes('debug=overflow'),
+
+  init() {
+    if (this._enabled) this.scan(true);
+  },
+
+  _describe(el) {
+    const id = el.id ? '#' + el.id : '';
+    const cls = (typeof el.className === 'string' && el.className)
+      ? '.' + el.className.trim().split(/\s+/).slice(0, 2).join('.')
+      : '';
+    return (el.tagName.toLowerCase() + id + cls).slice(0, 80);
+  },
+
+  _isVisible(el) {
+    const cs = getComputedStyle(el);
+    if (cs.display === 'none' || cs.visibility === 'hidden') return false;
     const rect = el.getBoundingClientRect();
-    if (rect.width > 0 && (rect.right > viewportWidth + 1 || rect.left < -1)) {
-      offenders.push({
-        tag: el.tagName,
-        id: el.id || '',
-        className: typeof el.className === 'string' ? el.className : '',
-        left: Math.round(rect.left),
-        right: Math.round(rect.right),
-        width: Math.round(rect.width),
-        viewportWidth
+    return rect.width > 0 && rect.height > 0;
+  },
+
+  findOffenders() {
+    const vw = document.documentElement.clientWidth;
+    const all = [];
+    document.querySelectorAll('body *').forEach(el => {
+      if (el.closest('#overflow-debug-panel') || el.classList.contains('overflow-highlight')) return;
+      if (!this._isVisible(el)) return;
+      const rect = el.getBoundingClientRect();
+      const overRight = rect.right - vw;
+      const overLeft = -rect.left;
+      if (overRight > 1 || overLeft > 1) {
+        all.push({
+          el,
+          selector: this._describe(el),
+          text: (el.textContent || '').trim().replace(/\s+/g, ' ').slice(0, 50),
+          left: Math.round(rect.left),
+          right: Math.round(rect.right),
+          width: Math.round(rect.width),
+          viewportWidth: vw,
+          overBy: Math.round(Math.max(overRight, overLeft))
+        });
+      }
+    });
+
+    // Keep leaf offenders: drop parents if a visible child also overflows
+    const leaf = all.filter(a => {
+      return !all.some(b => b.el !== a.el && a.el.contains(b.el));
+    });
+
+    leaf.sort((a, b) => b.overBy - a.overBy || b.width - a.width);
+    return {
+      viewportWidth: vw,
+      scrollWidth: document.documentElement.scrollWidth,
+      pageOverflow: document.documentElement.scrollWidth > vw + 1,
+      offenders: leaf,
+      allCount: all.length
+    };
+  },
+
+  clear() {
+    this._highlights.forEach(n => n.remove());
+    this._highlights = [];
+    document.getElementById('overflow-debug-panel').classList.remove('active');
+    document.getElementById('overflow-debug-panel-body').innerHTML = '';
+    const summary = document.getElementById('overflow-debug-summary');
+    if (summary) summary.textContent = '';
+    const list = document.getElementById('overflow-debug-list');
+    if (list) list.innerHTML = '';
+  },
+
+  scan(showUI) {
+    this.clear();
+    const result = this.findOffenders();
+
+    if (result.offenders.length) {
+      console.warn('[OverflowDebug] pageOverflow:', result.pageOverflow,
+        'scrollWidth:', result.scrollWidth, 'viewport:', result.viewportWidth,
+        'offenders:', result.offenders);
+    } else {
+      console.log('[OverflowDebug] No visible elements wider than viewport.',
+        'scrollWidth:', result.scrollWidth, 'viewport:', result.viewportWidth);
+    }
+
+    if (!showUI && !this._enabled) return result;
+
+    result.offenders.forEach((o, i) => {
+      const rect = o.el.getBoundingClientRect();
+      const box = document.createElement('div');
+      box.className = 'overflow-highlight';
+      box.style.top = rect.top + 'px';
+      box.style.left = rect.left + 'px';
+      box.style.width = rect.width + 'px';
+      box.style.height = rect.height + 'px';
+      const label = document.createElement('div');
+      label.className = 'overflow-highlight-label';
+      label.textContent = (i + 1) + ' +' + o.overBy + 'px ' + o.selector;
+      box.appendChild(label);
+      document.body.appendChild(box);
+      this._highlights.push(box);
+    });
+
+    const summaryText = result.pageOverflow
+      ? 'PAGE SCROLLS: scrollWidth ' + result.scrollWidth + 'px > viewport ' + result.viewportWidth + 'px'
+      : 'No page-level overflow (scrollWidth ' + result.scrollWidth + 'px)';
+    const offenderText = result.offenders.length
+      ? result.offenders.length + ' element(s) extend past viewport edge'
+      : 'No visible elements extend past viewport edge';
+
+    const panel = document.getElementById('overflow-debug-panel');
+    const body = document.getElementById('overflow-debug-panel-body');
+    if (result.offenders.length) {
+      panel.classList.add('active');
+      body.innerHTML = '<div style="margin-bottom:8px;color:var(--text-dim);">' + summaryText + '<br>' + offenderText + '</div>' +
+        result.offenders.map((o, i) =>
+          '<div class="od-row" data-idx="' + i + '">' +
+            '<div class="od-tag">' + (i + 1) + '. ' + Utils.escapeHtml(o.selector) + '</div>' +
+            '<div class="od-meta">width ' + o.width + 'px · right ' + o.right + 'px · over by ' + o.overBy + 'px</div>' +
+            (o.text ? '<div class="od-meta">"' + Utils.escapeHtml(o.text) + '"</div>' : '') +
+          '</div>'
+        ).join('');
+      body.querySelectorAll('.od-row').forEach(row => {
+        row.addEventListener('click', () => {
+          const o = result.offenders[Number(row.dataset.idx)];
+          if (o && o.el.scrollIntoView) o.el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        });
       });
     }
-  });
-  if (offenders.length) {
-    console.warn('Horizontal overflow offenders:', offenders);
+
+    const toolsSummary = document.getElementById('overflow-debug-summary');
+    const toolsList = document.getElementById('overflow-debug-list');
+    if (toolsSummary) {
+      toolsSummary.innerHTML = '<strong style="color:' + (result.pageOverflow ? 'var(--red)' : 'var(--accent)') + ';">' +
+        summaryText + '</strong><br>' + offenderText;
+    }
+    if (toolsList && result.offenders.length) {
+      toolsList.innerHTML = result.offenders.map((o, i) =>
+        '<div style="padding:6px 0;border-bottom:1px solid var(--border);">' +
+          '<strong>' + (i + 1) + '. ' + Utils.escapeHtml(o.selector) + '</strong><br>' +
+          'width ' + o.width + 'px, extends ' + o.overBy + 'px past edge' +
+          (o.text ? '<br><span style="color:var(--text-dim);">"' + Utils.escapeHtml(o.text) + '"</span>' : '') +
+        '</div>'
+      ).join('');
+    }
+
+    return result;
   }
+};
+
+/* =========================================================
+   DEBUG: HORIZONTAL OVERFLOW DETECTOR (console alias)
+   ========================================================= */
+function findHorizontalOverflow() {
+  return OverflowDebug.scan(true);
 }
 
 /* =========================================================
@@ -3127,6 +3354,7 @@ function updateBrowserBottomOffset() {
 
 document.addEventListener('DOMContentLoaded', () => {
   App.init();
+  OverflowDebug.init();
   updateBrowserBottomOffset();
 });
 window.addEventListener('resize', updateBrowserBottomOffset);
